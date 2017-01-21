@@ -276,16 +276,47 @@ uint16_t num_rows_callback2(MenuLayer *menu_layer, uint16_t section_index, void 
   }**/
 }
 
+ void select_long_click_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *callback_context)
+{
+//Get which row
+    int which = cell_index->row;
+   int numOfProj = persist_read_int((uint32_t)(-1));
+   for (int i=which;i<(numOfProj-1);i++){
  
+      // Read the string
+      char buffer[32];
+        persist_read_string((uint32_t)(3*(i+1)), buffer, sizeof(buffer));
+       persist_write_string((uint32_t)(3*(i)), buffer);
+       
+       int times[20];
+       persist_read_data((uint32_t)(3*(i+1)+1), &times, sizeof(int[20]));
+       persist_write_data((uint32_t)(3*(i)+1), &times, sizeof(int[20]));
+     
+       struct tm* dates[20];
+       persist_read_data((uint32_t)(3*(i+1)+2), &dates, sizeof(struct tm* [20]));
+       persist_write_data((uint32_t)(3*(i)+2), &dates, sizeof(struct tm* [20]));
+   }
+  
+   numOfProj=numOfProj-1;
+   persist_write_int((uint32_t)(-1), numOfProj);
+ 
+    numOfNames=numOfProj;
+    
+}
+
+
+
+
+
 void select_click_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *callback_context)
 {
 //Get which row
     int which = cell_index->row;
- 
+    if (which<numOfNames){
    
     whichProject=which;
     //PUSHING WINDOW ONTO THE STACK
-    seeTimeBlocks();
+  seeTimeBlocks();}
     
 }
 
@@ -372,7 +403,8 @@ void window_load(Window *window)
     MenuLayerCallbacks callbacks = {
         .draw_row = (MenuLayerDrawRowCallback) draw_row_callback,
         .get_num_rows = (MenuLayerGetNumberOfRowsInSectionsCallback) num_rows_callback,
-        .select_click = (MenuLayerSelectCallback) select_click_callback
+        .select_click = (MenuLayerSelectCallback) select_click_callback,
+        .select_long_click = (MenuLayerSelectCallback) select_long_click_callback
     };
     menu_layer_set_callbacks(menu_layer, NULL, callbacks);
  
@@ -392,9 +424,10 @@ void window_load2(Window *window2){
  
     //Give it its callbacks
     MenuLayerCallbacks callbacks2 = {
-        .draw_row = (MenuLayerDrawRowCallback) draw_row_callback2,
+        
         .get_num_rows = (MenuLayerGetNumberOfRowsInSectionsCallback) num_rows_callback2,
-        .select_click = (MenuLayerSelectCallback) select_click_callback2
+        .select_click = (MenuLayerSelectCallback) select_click_callback2,
+        .draw_row = (MenuLayerDrawRowCallback) draw_row_callback2,
     };
     menu_layer_set_callbacks(menu_layer2, NULL, callbacks2);
  

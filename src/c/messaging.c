@@ -39,14 +39,30 @@ void inbox_received_callback(DictionaryIterator *iterator, void *context) {
     strncpy(s_items_to_add_buffer, items_to_add_tuple->value->cstring, sizeof(s_items_to_add_buffer) - 1);
     //APP_LOG(APP_LOG_LEVEL_DEBUG, items_to_add_tuple->value->cstring);
     //text_layer_set_text(text_layer, items_to_add_tuple->value->cstring);
-    key =(uint32_t)(3* numOfNames);
-    passedString = items_to_add_tuple->value->cstring;
-    persist_write_string(key, passedString);
-    key = (uint32_t)(3* numOfNames + 1);
-    int times[20];
-    for (int i=0;i<20;i++){
-      times[i]=0;
-    }
+    
+    
+    /**
+     char spliting function goes here
+    
+    **/ 
+    passedString = items_to_add_tuple->value->cstring; 
+    char* best="";
+    int counter=0;
+    while (strlen(&passedString[counter])!=0){
+      if (passedString[counter] == ','){
+        
+          strcpy(best,passedString);
+        
+          best[counter]='\0' ;
+        
+         key =(uint32_t)(3* numOfNames);
+    
+        persist_write_string(key, best);
+        key = (uint32_t)(3* numOfNames + 1);
+        int times[20];
+        for (int i=0;i<20;i++){
+        times[i]=0;
+        }
     times[0]=-1;
     persist_write_data(key, &times, sizeof(int[20]));
     
@@ -55,13 +71,46 @@ void inbox_received_callback(DictionaryIterator *iterator, void *context) {
     struct tm** dates = calloc(20, sizeof(struct tm*[20]));
     persist_write_data(key, &dates, sizeof(struct tm*[20]));
     
-    
-   
-    // key = (uint32_t)(2* numOfNames + 1);
-    
-    // persist_write_string(key, passedString);
+  
     numOfNames=numOfNames+1;
     persist_write_int((uint32_t)(-1), numOfNames);
+        
+        passedString=&passedString[counter+1];
+        counter = 0;
+        
+      }
+      counter++;
+      
+    }
+    
+    
+    
+      strcpy(best,passedString);
+        
+          best[counter]='\0' ;
+        
+         key =(uint32_t)(3* numOfNames);
+    
+        persist_write_string(key, best);
+        key = (uint32_t)(3* numOfNames + 1);
+        int times[20];
+        for (int i=0;i<20;i++){
+        times[i]=0;
+        }
+    times[0]=-1;
+    persist_write_data(key, &times, sizeof(int[20]));
+    
+    
+     key = (uint32_t)(3* numOfNames + 2);
+    struct tm** dates = calloc(20, sizeof(struct tm*[20]));
+    persist_write_data(key, &dates, sizeof(struct tm*[20]));
+    
+  
+    numOfNames=numOfNames+1;
+    persist_write_int((uint32_t)(-1), numOfNames);
+    
+    
+    
 /**
     // Read the string
 char buffer[32];
