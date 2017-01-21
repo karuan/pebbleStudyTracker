@@ -273,8 +273,9 @@ void select_click_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *c
 
 void select_click_callback2(MenuLayer *menu_layer, MenuIndex *cell_index, void *callback_context, int index)
 {
-
-  if (cell_index->row == 0){
+int times[20];
+    persist_read_data((uint32_t)(2*whichProject+1),&times, sizeof(int[20]));
+  if (cell_index->row == 0 && times[0]==-1){
     firstClick=false;
     isPaused=false;
     isRunning = false;
