@@ -178,14 +178,18 @@ void seeTimeBlocks(){
 
 
 void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *callback_context) {
-  //  for (int i = 0; i < numOfNames; i++) {
-       // if (cell_index->row == i) {
+ 
             char buffer[32];
             persist_read_string((uint32_t) (2*cell_index->row), buffer, sizeof(buffer));
-            menu_cell_basic_draw(ctx, cell_layer, buffer, "", NULL); // change to pers storage
-        //    break;  
-      //  }
-  //  } 
+            int times[20];
+            persist_read_data((uint32_t)(2*cell_index->row + 1), &times, sizeof(int[20]));
+              if (times[0]==-1){
+                 menu_cell_basic_draw(ctx, cell_layer, buffer, "[in progress]", NULL); // change to pers storage
+              }
+              else{
+                menu_cell_basic_draw(ctx, cell_layer, buffer, "[completed]", NULL); 
+   
+  } 
 }
 
 void draw_row_callback2(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *callback_context) {
@@ -264,7 +268,7 @@ void select_click_callback2(MenuLayer *menu_layer, MenuIndex *cell_index, void *
   }
   else if (cell_index->row == numRows-1){
     
-    
+     ///////////////////
   }
     
 }
