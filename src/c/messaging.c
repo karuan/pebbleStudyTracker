@@ -44,8 +44,11 @@ void inbox_received_callback(DictionaryIterator *iterator, void *context) {
     persist_write_string(key, passedString);
     key = (uint32_t)(2* numOfNames + 1);
     int times[20];
+    for (int i=0;i<20;i++){
+      times[i]=0;
+    }
     times[0]=-1;
-    persist_write_data(key,times, sizeof(int[20]));
+    persist_write_data(key, &times, sizeof(int[20]));
    
     // key = (uint32_t)(2* numOfNames + 1);
     
