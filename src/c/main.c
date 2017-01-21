@@ -73,13 +73,25 @@ void up_click_handler3(ClickRecognizerRef recognizer, void *context){
   if (isPaused){
     int seconds = diffTime->tm_sec + diffTime->tm_min*60 + diffTime->tm_hour*3600;
     int times[20];
-    persist_read_data((uint32_t)(2*whichProject+1),&times, sizeof(int[20]));
+    persist_read_data((uint32_t)(3*whichProject+1),&times, sizeof(int[20]));
     int counter=0;
     while (times[counter]!=0){
       counter++;
     }
     times[counter]=seconds;
-    persist_write_data((uint32_t)(2*whichProject + 1), &times, sizeof(int[20]));
+    persist_write_data((uint32_t)(3*whichProject + 1), &times, sizeof(int[20]));
+    
+    struct tm *currentTime;
+	  time_t currentTemp;
+	  currentTemp = time(NULL);
+	  currentTime = localtime(&currentTemp);
+    struct tm** dates;
+    persist_read_data((uint32_t)(3*whichProject + 2), &dates, sizeof(struct tm*[20]));
+    dates[counter]= currentTime;
+    persist_write_data((uint32_t)(3*whichProject + 2), &dates, sizeof(struct tm*[20]));
+    
+    
+    
     text_layer_set_text(text_layer3, "committed your time");
     firstClick=true;
     currentTime=NULL;
@@ -180,9 +192,9 @@ void seeTimeBlocks(){
 void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *callback_context) {
  
             char buffer[32];
-            persist_read_string((uint32_t) (2*cell_index->row), buffer, sizeof(buffer));
+            persist_read_string((uint32_t) (3*cell_index->row), buffer, sizeof(buffer));
             int times[20];
-            persist_read_data((uint32_t)(2*cell_index->row + 1), &times, sizeof(int[20]));
+            persist_read_data((uint32_t)(3*cell_index->row + 1), &times, sizeof(int[20]));
               if (times[0]==-1){
                  menu_cell_basic_draw(ctx, cell_layer, buffer, "[in progress]", NULL); // change to pers storage
               }
@@ -194,13 +206,13 @@ void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, 
 
 void draw_row_callback2(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *callback_context) {
       int times[20];
-      persist_read_data((uint32_t)(2*whichProject+1), &times, sizeof(int[20]));
+      persist_read_data((uint32_t)(3*whichProject+1), &times, sizeof(int[20]));
         char buffer[] = "00:00:00";
         struct tm *dTime = malloc(sizeof(struct tm));
         int seconds;
         if (cell_index->row == 0 ) {   //note: if row==0; make it the add time option
             int times[20];
-          persist_read_data((uint32_t)(2*whichProject+1),&times, sizeof(int[20]));
+          persist_read_data((uint32_t)(3*whichProject+1),&times, sizeof(int[20]));
           if (times[0]==1){
             menu_cell_basic_draw(ctx, cell_layer, "add new block" , "[disabled]", NULL);
           }
@@ -210,7 +222,7 @@ void draw_row_callback2(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index,
         }
         else if (cell_index->row == numRows-1){
           int times[20];
-          persist_read_data((uint32_t)(2*whichProject+1),&times, sizeof(int[20]));
+          persist_read_data((uint32_t)(3*whichProject+1),&times, sizeof(int[20]));
           if (times[0]==1){
             menu_cell_basic_draw(ctx, cell_layer, "FINISHED" , "", NULL);
           }
@@ -229,6 +241,13 @@ void draw_row_callback2(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index,
             strftime(buffer, sizeof("00:00:00"), "%H:%M:%S", dTime);
             menu_cell_basic_draw(ctx, cell_layer, buffer , "", NULL); // change to pers storage
            
+        
+           struct tm** dates;
+            persist_read_data((uint32_t)(3*whichProject + 2), &dates, sizeof(struct tm*[20]));
+            char dateBuffer[26];
+            strftime(dateBuffer, 26, "%Y-%m-%d", dates[cell_index->row]);
+            menu_cell_basic_draw(ctx, cell_layer, buffer , dateBuffer, NULL); 
+        
         }
     
 }
@@ -241,7 +260,7 @@ uint16_t num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *
 uint16_t num_rows_callback2(MenuLayer *menu_layer, uint16_t section_index, void *callback_context)
 {
   int times[20];
-  persist_read_data((uint32_t)(2*whichProject+1), &times, sizeof(int[20]));
+  persist_read_data((uint32_t)(3*whichProject+1), &times, sizeof(int[20]));
   int counter = 0;
   while (times[counter]!=0){
     counter++;
@@ -274,7 +293,7 @@ void select_click_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *c
 void select_click_callback2(MenuLayer *menu_layer, MenuIndex *cell_index, void *callback_context, int index)
 {
 int times[20];
-    persist_read_data((uint32_t)(2*whichProject+1),&times, sizeof(int[20]));
+    persist_read_data((uint32_t)(3*whichProject+1),&times, sizeof(int[20]));
   if (cell_index->row == 0 && times[0]==-1){
     firstClick=false;
     isPaused=false;
@@ -283,9 +302,9 @@ int times[20];
   }
   else if (cell_index->row == numRows-1){
     int times[20];
-    persist_read_data((uint32_t)(2*whichProject+1),&times, sizeof(int[20]));
+    persist_read_data((uint32_t)(3*whichProject+1),&times, sizeof(int[20]));
      times[0]=1;
-    persist_write_data((uint32_t)(2*whichProject + 1), &times, sizeof(int[20]));
+    persist_write_data((uint32_t)(3*whichProject + 1), &times, sizeof(int[20]));
      ///////////////////
   }
     
