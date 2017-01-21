@@ -5,6 +5,9 @@
 Window* window;
 TextLayer *text_layer;
 char* passedString=NULL;
+char** listOfNames=NULL;
+int numOfNames=0;
+uint32_t keyTemp=0;
 
 void up_click_handler(ClickRecognizerRef recognizer, void *context){
 	text_layer_set_text(text_layer, "You pressed UP!");
@@ -16,9 +19,18 @@ void down_click_handler(ClickRecognizerRef recognizer, void *context){
 }
 
 void select_click_handler(ClickRecognizerRef recognizer, void *context){
-	if (passedString!=NULL){
-    text_layer_set_text(text_layer, passedString);
+	char* totalList="";
+  for (int i=0;i<numOfNames; i++){
+    keyTemp=(uint32_t)i;
+    char buffer[32];
+    persist_read_string(keyTemp, buffer, sizeof(buffer));
+    strcat(totalList, buffer);
   }
+  
+  
+  
+    text_layer_set_text(text_layer, totalList);
+  
 }
 
 

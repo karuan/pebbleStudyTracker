@@ -5,6 +5,7 @@
 
 static char s_items_to_add_buffer[512];
 
+uint32_t key=0;
 void (*message_processed_callback)(void);
 
 void messaging_init(void (*processed_callback)(void)) {
@@ -34,7 +35,20 @@ void inbox_received_callback(DictionaryIterator *iterator, void *context) {
     strncpy(s_items_to_add_buffer, items_to_add_tuple->value->cstring, sizeof(s_items_to_add_buffer) - 1);
     //APP_LOG(APP_LOG_LEVEL_DEBUG, items_to_add_tuple->value->cstring);
     //text_layer_set_text(text_layer, items_to_add_tuple->value->cstring);
-   passedString = items_to_add_tuple->value->cstring;
+    key =(uint32_t) numOfNames;
+    passedString = items_to_add_tuple->value->cstring;
+    // Write the string
+    persist_write_string(key, passedString);
+    numOfNames++;
+/**
+    // Read the string
+char buffer[32];
+persist_read_string(key, buffer, sizeof(buffer));
+    
+    
+    passedString = items_to_add_tuple->value->cstring;
+    **/
+    
   }
 
   // notify the main screen, in case something changed
