@@ -199,10 +199,24 @@ void draw_row_callback2(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index,
         struct tm *dTime = malloc(sizeof(struct tm));
         int seconds;
         if (cell_index->row == 0 ) {   //note: if row==0; make it the add time option
+            int times[20];
+          persist_read_data((uint32_t)(2*whichProject+1),&times, sizeof(int[20]));
+          if (times[0]==1){
+            menu_cell_basic_draw(ctx, cell_layer, "add new block" , "[disabled]", NULL);
+          }
+         else {
             menu_cell_basic_draw(ctx, cell_layer, "add new block" , "", NULL);
+          }
         }
         else if (cell_index->row == numRows-1){
-            menu_cell_basic_draw(ctx, cell_layer, "finished assignment" , "", NULL);
+          int times[20];
+          persist_read_data((uint32_t)(2*whichProject+1),&times, sizeof(int[20]));
+          if (times[0]==1){
+            menu_cell_basic_draw(ctx, cell_layer, "FINISHED" , "", NULL);
+          }
+          else{
+            menu_cell_basic_draw(ctx, cell_layer, "finish" , "", NULL);
+          }
         }
         
         else {
@@ -267,7 +281,10 @@ void select_click_callback2(MenuLayer *menu_layer, MenuIndex *cell_index, void *
      window_stack_push(window3,true);
   }
   else if (cell_index->row == numRows-1){
-    
+    int times[20];
+    persist_read_data((uint32_t)(2*whichProject+1),&times, sizeof(int[20]));
+     times[0]=1;
+    persist_write_data((uint32_t)(2*whichProject + 1), &times, sizeof(int[20]));
      ///////////////////
   }
     
