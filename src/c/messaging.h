@@ -1,5 +1,7 @@
 #pragma once
 #include <pebble.h>
+#include <string.h>
+#include <stdbool.h>
 
 #define projectName 0
 

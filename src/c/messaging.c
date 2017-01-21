@@ -1,7 +1,11 @@
 #include <pebble.h>
+#include <string.h>
 #include <pebble.h>
+#include <stdbool.h>
 #include "messaging.h"
 #include "main.h"
+
+
 
 static char s_items_to_add_buffer[512];
 
@@ -35,11 +39,19 @@ void inbox_received_callback(DictionaryIterator *iterator, void *context) {
     strncpy(s_items_to_add_buffer, items_to_add_tuple->value->cstring, sizeof(s_items_to_add_buffer) - 1);
     //APP_LOG(APP_LOG_LEVEL_DEBUG, items_to_add_tuple->value->cstring);
     //text_layer_set_text(text_layer, items_to_add_tuple->value->cstring);
-    key =(uint32_t) numOfNames;
+    key =(uint32_t)(2* numOfNames);
     passedString = items_to_add_tuple->value->cstring;
-    // Write the string
     persist_write_string(key, passedString);
-    numOfNames++;
+    key = (uint32_t)(2* numOfNames + 1);
+    int times[20];
+    times[0]=-1;
+    persist_write_data(key,times, sizeof(int[20]));
+   
+    // key = (uint32_t)(2* numOfNames + 1);
+    
+    // persist_write_string(key, passedString);
+    numOfNames=numOfNames+1;
+    persist_write_int((uint32_t)(-1), numOfNames);
 /**
     // Read the string
 char buffer[32];
