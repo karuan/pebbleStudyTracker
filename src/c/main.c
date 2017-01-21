@@ -22,17 +22,152 @@ int whichProject=0;
 int numRows=0;
 
 
-/** STOPWATCH STUFF 
+/** STOPWATCH STUFF **/
 char* message=NULL;
 char* totalMessage=NULL;
- //struct tm *currentTime;
-//struct tm *diffTime;
-char buffer[] = "00:00:00";
+bool firstClick=false;
+bool isPaused=false;
+struct tm *diffTime;
+char buffer2[] = "00:00:00";
 
 AppTimer *timer;
 bool isRunning = false;
 char* currentTime = NULL;
- END STOPWATCH STUFF **/
+/** END STOPWATCH STUFF **/
+
+
+/* ~~~  START OF STOPWATCH FUNCTION ~~~~*/
+
+
+void tick_handler(struct tm *tick_time, TimeUnits units_changed){
+	
+
+ //make a time structure with the difference in time
+  if (diffTime->tm_sec==59){
+    diffTime->tm_sec=0;
+    diffTime->tm_min=diffTime->tm_min + 1;
+  }
+  else{
+    diffTime->tm_sec = diffTime->tm_sec + 1;
+  }
+  if (diffTime->tm_min == 60){
+    diffTime->tm_min = 0;
+    diffTime->tm_hour=diffTime->tm_hour + 1;
+  }
+ 
+ 
+  	strftime(buffer2, sizeof("00:00:00"), "%H:%M:%S", diffTime);
+  
+   
+        //Change the TextLayer text to show the new time!
+        text_layer_set_text(text_layer3, buffer2);
+	
+}
+
+
+
+
+
+void up_click_handler3(ClickRecognizerRef recognizer, void *context){
+	//text_layer_set_text(text_layer, "You pressed UP!");
+  if (isPaused){
+    int seconds = diffTime->tm_sec + diffTime->tm_min*60 + diffTime->tm_hour*3600;
+    int times[20];
+    persist_read_data((uint32_t)(2*whichProject+1),&times, sizeof(int[20]));
+    int counter=0;
+    while (times[counter]!=0){
+      counter++;
+    }
+    times[counter]=seconds;
+    persist_write_data((uint32_t)(2*whichProject + 1), &times, sizeof(int[20]));
+    text_layer_set_text(text_layer3, "committed your time");
+    firstClick=true;
+    currentTime=NULL;
+    isPaused=false;
+    isRunning=false;
+  }
+}
+
+void down_click_handler3(ClickRecognizerRef recognizer, void *context){
+if (isPaused){
+
+    text_layer_set_text(text_layer3, "deleted your time");
+    firstClick=true;
+    currentTime=NULL;
+    isPaused=false;
+    isRunning=false;
+  }
+
+}
+
+void select_click_handler3(ClickRecognizerRef recognizer, void *context){
+  
+  struct tm *t;
+	time_t temp;
+	temp = time(NULL);
+	t = localtime(&temp);
+  
+  if (isRunning == false && isPaused == true){
+    
+    
+    tick_timer_service_subscribe(SECOND_UNIT, (TickHandler) tick_handler);	
+
+   tick_handler (t, SECOND_UNIT);
+    isPaused=false;
+    isRunning=true;
+    
+    
+    
+  } 
+  
+  else if (isRunning == false && isPaused == false){
+     if (firstClick == true){
+    text_layer_set_text(text_layer3,  "press select to start timer");
+      firstClick=false;
+      }
+  else if (firstClick==false){
+  firstClick=true;
+
+
+/**
+  //make a time structure with the current time
+  currentTime = malloc(sizeof(struct tm));
+  currentTime->tm_sec = t->tm_sec;
+  currentTime->tm_min = t->tm_min;
+  currentTime->tm_hour = t->tm_hour;**/
+  
+  diffTime = malloc(sizeof(struct tm));
+  
+diffTime->tm_sec = -1;
+  diffTime->tm_min =0;
+  diffTime->tm_hour = 0;
+	//manually call the tick handler when the window is loading
+	  //don't actually understand why passing in SECOND_UNIT bc not used
+    tick_timer_service_subscribe(SECOND_UNIT, (TickHandler) tick_handler);	
+
+   tick_handler (t, SECOND_UNIT);
+    
+    isRunning = true;
+  }
+  }
+  else if (isRunning == true){
+    isRunning=false;
+    isPaused = true;
+    currentTime=buffer2;
+    tick_timer_service_unsubscribe(); 
+  }
+    
+    
+}
+
+/** ~~~~ END OF STOPWATCH FUNCTIONS ~~~~ */
+
+void click_config_provider3(void *context)
+{
+    window_single_click_subscribe(BUTTON_ID_UP, up_click_handler3);
+    window_single_click_subscribe(BUTTON_ID_DOWN, down_click_handler3);
+    window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler3);
+}
 
 
 
@@ -94,7 +229,14 @@ uint16_t num_rows_callback2(MenuLayer *menu_layer, uint16_t section_index, void 
     counter++;
   }
   numRows=counter+1;
-  return counter+1; 
+ // if (times[0]==-1){
+  
+    return counter+1; 
+ /**
+  }
+  else{
+    return counter;
+  }**/
 }
 
  
@@ -115,8 +257,10 @@ void select_click_callback2(MenuLayer *menu_layer, MenuIndex *cell_index, void *
 {
 
   if (cell_index->row == 0){
-    
-    
+    firstClick=false;
+    isPaused=false;
+    isRunning = false;
+     window_stack_push(window3,true);
   }
   else if (cell_index->row == numRows-1){
     
@@ -124,6 +268,10 @@ void select_click_callback2(MenuLayer *menu_layer, MenuIndex *cell_index, void *
   }
     
 }
+
+
+
+
 
 
 
@@ -220,6 +368,20 @@ void window_load3(Window *window2){
   //menulayer stuff
   // TIMER STUFF
   
+   //We will add the creation of the Window's elements here soon!
+	text_layer3 = text_layer_create(GRect(0, 53, 132, 168));
+   text_layer_set_background_color(text_layer3, GColorClear);
+   text_layer_set_text_color(text_layer3, GColorBlack);
+
+	text_layer_set_text_alignment(text_layer3, GTextAlignmentCenter);
+  text_layer_set_text(text_layer3, "press select to start timer");
+  text_layer_set_font(text_layer3, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
+
+  layer_add_child(window_get_root_layer(window3), text_layer_get_layer(text_layer3));
+
+
+//get a time structure so that the face doesn’t start blank
+  
 }
 
 
@@ -237,7 +399,11 @@ void window_unload2(Window *window2){
 
 void window_unload3(Window *window3){
    //menu_layer_destroy(menu_layer2); 
-  
+   //We will safely destroy the Window's elements here!
+	text_layer_destroy(text_layer3);
+
+	//cancel timer
+	//app_timer_cancel(timer);
 }
 
 /* Initialize the main app elements */
@@ -260,6 +426,9 @@ void init()
         .load = window_load3,
         .unload = window_unload3
     };  
+  
+ 
+   window_set_click_config_provider(window3, click_config_provider3);
     window_set_window_handlers(window, (WindowHandlers) handlers);
     window_set_window_handlers(window2, (WindowHandlers) handlers2);
      window_set_window_handlers(window3, (WindowHandlers) handlers3);
@@ -280,6 +449,8 @@ void deinit()
 {
     
     window_destroy(window);
+  window_destroy(window2);
+  window_destroy(window3);
 }
  
 /* Main app lifecycle */
