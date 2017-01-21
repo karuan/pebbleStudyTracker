@@ -245,7 +245,7 @@ void draw_row_callback2(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index,
            struct tm** dates;
             persist_read_data((uint32_t)(3*whichProject + 2), &dates, sizeof(struct tm*[20]));
             char dateBuffer[26];
-            strftime(dateBuffer, 26, "%Y-%m-%d", dates[cell_index->row]);
+            strftime(dateBuffer, 26, "%m-%d-%Y", dates[cell_index->row]);
             menu_cell_basic_draw(ctx, cell_layer, buffer , dateBuffer, NULL); 
         
         }
