@@ -381,13 +381,13 @@ void click_config_provider(void *context)
  /* Load all Window sub-elements */
 void window_load(Window *window)
 {
-    text_layer = text_layer_create(GRect(0, 0, 144, 168));
-    text_layer_set_background_color(text_layer, GColorClear);
-    text_layer_set_text_color(text_layer, GColorBlack);
-    layer_add_child(window_get_root_layer(window), (Layer*) text_layer);
-    text_layer_set_text(text_layer, "My first watchapp!");
+ 
 
 
+  
+  
+   
+if (persist_exists((uint32_t)(-1)) && persist_read_int((uint32_t)(-1))>0) {
     //menulayer stuff
     //Create it - 12 is approx height of the top bar
     menu_layer = menu_layer_create(GRect(0, 0, 144, 168 - 16));
@@ -409,7 +409,19 @@ void window_load(Window *window)
     menu_layer_set_callbacks(menu_layer, NULL, callbacks);
  
     //Add to Window
-    layer_add_child(window_get_root_layer(window), menu_layer_get_layer(menu_layer));
+ APP_LOG(APP_LOG_LEVEL_DEBUG, "have list items");
+ layer_add_child(window_get_root_layer(window), menu_layer_get_layer(menu_layer));
+} else {
+     text_layer = text_layer_create(GRect(0, 0, 144, 168));
+    text_layer_set_background_color(text_layer, GColorClear);
+    text_layer_set_text_color(text_layer, GColorBlack);
+    layer_add_child(window_get_root_layer(window), (Layer*) text_layer);
+  text_layer_set_text_alignment(text_layer, GTextAlignmentCenter);
+    text_layer_set_text(text_layer, "You currently do not have any projects.");
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "no list items");
+   layer_add_child(window_get_root_layer(window), text_layer_get_layer(text_layer)); 
+  }
+
 }
 
 
@@ -508,9 +520,17 @@ void init()
      window_set_window_handlers(window3, (WindowHandlers) handlers3);
     //IN ORDER TO USE CLICK, NEED TO USE CLICK CONFIG PROVIDER
     //window_set_click_config_provider(window, click_config_provider);
-    
+   
+
+  
     window_stack_push(window, true);
-    
+  /**
+  
+    layer_add_child(window_get_root_layer(window), menu_layer_get_layer(menu_layer));
+
+  **/
+  
+  
     //data initialization
     numOfNames=persist_read_int((uint32_t)(-1));
   
