@@ -241,12 +241,12 @@ void draw_row_callback2(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index,
             strftime(buffer, sizeof("00:00:00"), "%H:%M:%S", dTime);
             menu_cell_basic_draw(ctx, cell_layer, buffer , "", NULL); // change to pers storage
            
-        
+        /**
            struct tm** dates;
             persist_read_data((uint32_t)(3*whichProject + 2), &dates, sizeof(struct tm*[20]));
             char dateBuffer[26];
-            strftime(dateBuffer, 26, "%m-%d-%Y", dates[cell_index->row]);
-            menu_cell_basic_draw(ctx, cell_layer, buffer , dateBuffer, NULL); 
+            strftime(dateBuffer, 26, "%m-%d-%Y", dates[cell_index->row]);***/
+            menu_cell_basic_draw(ctx, cell_layer, buffer , "01-22-2017", NULL); 
         
         }
     
