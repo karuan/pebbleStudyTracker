@@ -81,7 +81,7 @@ void up_click_handler3(ClickRecognizerRef recognizer, void *context){
     times[counter]=seconds;
     persist_write_data((uint32_t)(3*whichProject + 1), &times, sizeof(int[20]));
     
-    struct tm *currentTime;
+    /**struct tm *currentTime;
 	  time_t currentTemp;
 	  currentTemp = time(NULL);
 	  currentTime = localtime(&currentTemp);
@@ -91,7 +91,7 @@ void up_click_handler3(ClickRecognizerRef recognizer, void *context){
     persist_write_data((uint32_t)(3*whichProject + 2), &dates, sizeof(struct tm*[20]));
     
     
-    
+    **/
     text_layer_set_text(text_layer3, "committed your time");
     firstClick=true;
     currentTime=NULL;

@@ -66,11 +66,11 @@ void inbox_received_callback(DictionaryIterator *iterator, void *context) {
     times[0]=-1;
     persist_write_data(key, &times, sizeof(int[20]));
     
-    
+    /**
      key = (uint32_t)(3* numOfNames + 2);
     struct tm** dates = calloc(20, sizeof(struct tm*[20]));
     persist_write_data(key, &dates, sizeof(struct tm*[20]));
-    
+    **/
   
     numOfNames=numOfNames+1;
     persist_write_int((uint32_t)(-1), numOfNames);
